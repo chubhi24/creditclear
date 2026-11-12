@@ -1,0 +1,74 @@
+{
+  "version": "lr-1.0.0-simulated",
+  "trainingData": "simulated",
+  "trainedRows": 36000,
+  "intercept": -2.0956553308140813,
+  "features": [
+    {
+      "key": "essentials_ratio",
+      "mean": 0.7539937738531526,
+      "scale": 0.17781739156847287,
+      "weight": 0.3760959452051522
+    },
+    {
+      "key": "recharge_coverage",
+      "mean": 1.7474869505326176,
+      "scale": 0.8392808257918939,
+      "weight": -0.06948074292397953
+    },
+    {
+      "key": "rent_on_time_evidence",
+      "mean": 78.47823564814814,
+      "scale": 13.276518863977493,
+      "weight": -0.37346848983386294
+    },
+    {
+      "key": "utility_on_time_evidence",
+      "mean": 74.80523333333335,
+      "scale": 14.643793910095773,
+      "weight": -0.37773227642503776
+    },
+    {
+      "key": "rent_months",
+      "mean": 17.811222222222224,
+      "scale": 13.896331516529244,
+      "weight": -0.05460820384823772
+    },
+    {
+      "key": "utility_months",
+      "mean": 17.762027777777778,
+      "scale": 13.743528064725416,
+      "weight": -0.06481979439899892
+    },
+    {
+      "key": "employment_rank",
+      "mean": 1.5942777777777777,
+      "scale": 0.8562843054315518,
+      "weight": -0.30271997741031
+    },
+    {
+      "key": "new_borrower",
+      "mean": 0.5991111111111111,
+      "scale": 0.49007855253451055,
+      "weight": 0.4355966064622152
+    },
+    {
+      "key": "missed_payments",
+      "mean": 0.09286111111111112,
+      "scale": 0.2902377045704451,
+      "weight": 0.41525750574249465
+    }
+  ],
+  "constants": {
+    "onTimePrior": 75,
+    "fullEvidenceMonths": 12,
+    "maxEssentialsRatio": 1.5,
+    "maxRechargeCoverage": 4,
+    "employmentRank": {
+      "unemployed": 0,
+      "informal": 1,
+      "self-employed": 2,
+      "salaried": 3
+    }
+  }
+}

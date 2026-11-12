@@ -1,0 +1,258 @@
+{
+  "applicationId": "sample",
+  "createdAt": "2026-11-02T09:09:36.606Z",
+  "modelVersion": "lr-1.0.0-simulated",
+  "scoringMethod": "logistic-regression",
+  "trainingData": "simulated",
+  "score": 51,
+  "band": {
+    "id": "borderline",
+    "label": "Borderline",
+    "detail": "There is a path to approval with a few more months of clean payments."
+  },
+  "topFactors": [
+    {
+      "key": "loanHistory",
+      "label": "Loan repayment history",
+      "value": "No loans yet",
+      "contribution": -0.1723,
+      "points": -4,
+      "direction": "held-back",
+      "message": "You have no loan history yet, so there is no repayment record to rely on. New borrowers start lower.",
+      "improve": "You have no loan record yet. Take a small loan or credit-builder product and repay every instalment on time for 6 months.",
+      "projectedScore": 67
+    },
+    {
+      "key": "employment",
+      "label": "Employment",
+      "value": "Informal / gig",
+      "contribution": -0.162,
+      "points": -4,
+      "direction": "held-back",
+      "message": "Less predictable income makes repayments harder to plan.",
+      "improve": "Your income is informal or gig work. Bank statements or platform payouts showing regular monthly deposits make it count as steadier."
+    },
+    {
+      "key": "essentials",
+      "label": "Essentials against income",
+      "value": "83% of income",
+      "contribution": -0.1276,
+      "points": -3,
+      "direction": "held-back",
+      "message": "Your essentials, adjusted for local inflation, take up most of your income.",
+      "improve": "Essentials take 83% of income (₹16,644 of ₹20,000). Cutting about ₹4,644 a month, or showing that much more regular income, brings them to 60%.",
+      "projectedScore": 60
+    }
+  ],
+  "contributions": [
+    {
+      "key": "loanHistory",
+      "label": "Loan repayment history",
+      "value": "No loans yet",
+      "contribution": -0.1723,
+      "points": -4,
+      "direction": "held-back",
+      "message": "You have no loan history yet, so there is no repayment record to rely on. New borrowers start lower.",
+      "improve": "You have no loan record yet. Take a small loan or credit-builder product and repay every instalment on time for 6 months.",
+      "projectedScore": 67
+    },
+    {
+      "key": "employment",
+      "label": "Employment",
+      "value": "Informal / gig",
+      "contribution": -0.162,
+      "points": -4,
+      "direction": "held-back",
+      "message": "Less predictable income makes repayments harder to plan.",
+      "improve": "Your income is informal or gig work. Bank statements or platform payouts showing regular monthly deposits make it count as steadier."
+    },
+    {
+      "key": "essentials",
+      "label": "Essentials against income",
+      "value": "83% of income",
+      "contribution": -0.1276,
+      "points": -3,
+      "direction": "held-back",
+      "message": "Your essentials, adjusted for local inflation, take up most of your income.",
+      "improve": "Essentials take 83% of income (₹16,644 of ₹20,000). Cutting about ₹4,644 a month, or showing that much more regular income, brings them to 60%.",
+      "projectedScore": 60
+    },
+    {
+      "key": "rentOnTime",
+      "label": "Rent on-time record",
+      "value": "72% over 6 months",
+      "contribution": -0.108,
+      "points": -3,
+      "direction": "held-back",
+      "message": "Late rent payments, or too short a record to prove consistency, weighed on the score.",
+      "improve": "Rent is on time 72% of the time over 6 months. Pay on or before the due date for the next 6 months and it becomes 86% over 12 months.",
+      "projectedScore": 58
+    },
+    {
+      "key": "rechargeCapability",
+      "label": "Recharge capability",
+      "value": "0.9× the cheapest live plan",
+      "contribution": -0.0514,
+      "points": -1,
+      "direction": "held-back",
+      "message": "Your recharge spend is close to, or below, the cheapest current plan from your operator.",
+      "improve": "You spend ₹179 a month; the cheapest Jio plan costs ₹190. Keeping a plan of about ₹380 a month active without gaps shows steady cash flow.",
+      "projectedScore": 52
+    },
+    {
+      "key": "utilityHistory",
+      "label": "Utility history length",
+      "value": "5 months",
+      "contribution": -0.0464,
+      "points": -1,
+      "direction": "held-back",
+      "message": "Utility history is still short, so there is less evidence of consistency.",
+      "improve": "You have 5 months of bill history. Keeping the same accounts and paying on time for 12 more months makes it 17 months at 91% on time.",
+      "projectedScore": 61
+    },
+    {
+      "key": "utilityOnTime",
+      "label": "Bill on-time record",
+      "value": "70% over 5 months",
+      "contribution": -0.0376,
+      "points": -1,
+      "direction": "held-back",
+      "message": "Late bills, or too short a record to prove consistency, weighed on the score.",
+      "improve": "Bills are paid on time 70% of the time over 5 months. Put electricity and water on autopay for 6 months and it becomes 86% over 11 months.",
+      "projectedScore": 57
+    },
+    {
+      "key": "rentHistory",
+      "label": "Rent history length",
+      "value": "6 months",
+      "contribution": -0.0358,
+      "points": -1,
+      "direction": "held-back",
+      "message": "Rent history is brief, so the model cannot yet reward stability.",
+      "improve": "You have 6 months of rent history. Staying in a documented rental and paying on time for 12 more months makes it 18 months at 91% on time.",
+      "projectedScore": 61
+    }
+  ],
+  "plan": {
+    "currentScore": 51,
+    "goal": {
+      "score": 70,
+      "band": "clear",
+      "label": "Clear"
+    },
+    "finalScore": 75,
+    "reachesGoal": true,
+    "steps": [
+      {
+        "key": "essentials",
+        "label": "Essentials against income",
+        "action": "Cut about ₹4,644 a month from fixed costs, or document extra income",
+        "months": 1,
+        "scoreAfter": 60
+      },
+      {
+        "key": "loanHistory",
+        "label": "Loan repayment history",
+        "action": "Take a small credit-builder loan and set its EMI to autopay",
+        "months": 6,
+        "scoreAfter": 75
+      }
+    ],
+    "milestones": [
+      {
+        "month": 1,
+        "completes": [
+          "Essentials against income"
+        ],
+        "expectedScore": 60,
+        "band": "borderline"
+      },
+      {
+        "month": 6,
+        "completes": [
+          "Loan repayment history"
+        ],
+        "expectedScore": 75,
+        "band": "clear"
+      }
+    ]
+  },
+  "eligibility": {
+    "decision": {
+      "id": "reduced",
+      "label": "Eligible for a smaller amount",
+      "detail": "A loan of up to ₹8,000 over 12 months fits your budget today."
+    },
+    "requestedAmount": 30000,
+    "tenureMonths": 12,
+    "annualRatePct": 21.5,
+    "repoRatePct": 5.5,
+    "lenderSpreadPct": 16,
+    "requestedEmi": 2801,
+    "maxAmount": 8000,
+    "monthlyCapacity": 1510,
+    "essentials": 16644,
+    "surplus": 3356,
+    "inflationPct": 1.62,
+    "inflationRegion": "Maharashtra",
+    "inflationPeriod": "December 2025",
+    "cheapestPlan": {
+      "name": "Rs 177_28D_Voice",
+      "price": 177,
+      "validityDays": 28,
+      "monthlyCost": 190
+    },
+    "rechargeCoverage": 0.94,
+    "checks": [
+      {
+        "id": "score",
+        "label": "Credit score band",
+        "passed": true,
+        "detail": "Score 51 (Borderline)."
+      },
+      {
+        "id": "repayment",
+        "label": "Repayment within 50% of income",
+        "passed": true,
+        "detail": "New EMI ₹2,801 plus existing EMIs ₹0, against income ₹20,000."
+      },
+      {
+        "id": "surplus",
+        "label": "Fits the monthly surplus",
+        "passed": false,
+        "detail": "Surplus after inflation-adjusted essentials is ₹3,356."
+      },
+      {
+        "id": "recharge",
+        "label": "Recharge covers the cheapest live plan",
+        "passed": false,
+        "detail": "You spend ₹179/month; the cheapest Jio plan costs ₹190/month."
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "telecom-jio",
+      "label": "Jio prepaid plans",
+      "url": "https://www.jio.com/api/jio-mdmdata-service/mdmdata/recharge/plans?productType=MOBILITY&billingType=1",
+      "status": "live",
+      "fetchedAt": "2026-11-02T09:09:37.012Z"
+    },
+    {
+      "id": "rbi-repo-rate",
+      "label": "RBI policy repo rate",
+      "url": "https://www.rbi.org.in/",
+      "status": "live",
+      "fetchedAt": "2026-11-02T09:09:37.608Z"
+    },
+    {
+      "id": "mospi-cpi-27",
+      "label": "MoSPI CPI inflation, Maharashtra",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIIndex?Format=JSON&limit=1&state_code=27&sector_code=3&group_code=0",
+      "status": "live",
+      "fetchedAt": "2026-11-02T09:09:36.967Z"
+    }
+  ],
+  "sample": true,
+  "applicantName": "Aarav"
+}

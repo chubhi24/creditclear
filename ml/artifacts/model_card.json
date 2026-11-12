@@ -1,0 +1,20 @@
+{
+  "model_version": "lr-1.0.0-simulated",
+  "model": "logistic regression",
+  "status": "Trained on SIMULATED outcomes. Not for real lending decisions.",
+  "features": [
+    "essentials_ratio",
+    "recharge_coverage",
+    "rent_on_time_evidence",
+    "utility_on_time_evidence",
+    "rent_months",
+    "utility_months",
+    "employment_rank",
+    "new_borrower",
+    "missed_payments"
+  ],
+  "challenger": {
+    "model": "xgboost",
+    "trees": 179
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "rows": {
+    "train": 36000,
+    "valid": 12000,
+    "test": 12000
+  },
+  "default_rate_test": 0.15075,
+  "test": {
+    "logistic_regression": {
+      "auc": 0.7671760691955567,
+      "gini": 0.5343521383911134,
+      "ks": 0.4075390554505137,
+      "brier": 0.10926665635056829,
+      "log_loss": 0.3601271031575902
+    },
+    "xgboost": {
+      "auc": 0.7712463912732807,
+      "gini": 0.5424927825465613,
+      "ks": 0.40561038720960335,
+      "brier": 0.10888555645942688,
+      "log_loss": 0.35843053460121155
+    },
+    "rule_formula_auc": 0.7437559528429875,
+    "oracle_auc": 0.7884706690383927
+  },
+  "accuracy": {
+    "logistic_at_0.5": 0.8568333333333333,
+    "always_no_default": 0.8492500000000001
+  },
+  "auc_gain_over_formula": {
+    "point": 0.023420116352569242,
+    "ci95": [
+      0.016896565839414283,
+      0.029757935157413668
+    ]
+  },
+  "bands": {
+    "logistic_regression": {
+      "Clear": {
+        "share": 0.5035,
+        "default_rate": 0.057431314134392585
+      },
+      "Borderline": {
+        "share": 0.33875,
+        "default_rate": 0.16728167281672818
+      },
+      "Room to improve": {
+        "share": 0.15775,
+        "default_rate": 0.41310089804543054
+      }
+    },
+    "rule_formula": {
+      "Clear": {
+        "share": 0.3884166666666667,
+        "default_rate": 0.05706929843381248
+      },
+      "Borderline": {
+        "share": 0.42983333333333335,
+        "default_rate": 0.1430787126793331
+      },
+      "Room to improve": {
+        "share": 0.18175,
+        "default_rate": 0.36909674461256303
+      }
+    }
+  },
+  "shuffled_label_auc": 0.51938619140584,
+  "standardised_weights": {
+    "essentials_ratio": 0.3761,
+    "recharge_coverage": -0.0695,
+    "rent_on_time_evidence": -0.3735,
+    "utility_on_time_evidence": -0.3777,
+    "rent_months": -0.0546,
+    "utility_months": -0.0648,
+    "employment_rank": -0.3027,
+    "new_borrower": 0.4356,
+    "missed_payments": 0.4153
+  },
+  "node_python_max_probability_gap": 3.3306690738754696e-16,
+  "fairness": {
+    "audit_sector": {
+      "rural": {
+        "n": 5451.0,
+        "mean_score": 66.78022381214456,
+        "predicted": 0.14563779569272367,
+        "actual": 0.1495138506696019
+      },
+      "urban": {
+        "n": 6549.0,
+        "mean_score": 66.35639028859367,
+        "predicted": 0.14905091817066493,
+        "actual": 0.1517788975416094
+      }
+    },
+    "audit_household_size": {
+      "1": {
+        "n": 453.0,
+        "mean_score": 66.01986754966887,
+        "predicted": 0.15375167935745473,
+        "actual": 0.1545253863134658
+      },
+      "2": {
+        "n": 1163.0,
+        "mean_score": 66.731728288908,
+        "predicted": 0.14595828776799744,
+        "actual": 0.14015477214101463
+      },
+      "3": {
+        "n": 2428.0,
+        "mean_score": 66.43492586490939,
+        "predicted": 0.14800318698695647,
+        "actual": 0.16021416803953872
+      },
+      "4": {
+        "n": 3612.0,
+        "mean_score": 66.9280177187154,
+        "predicted": 0.14405589752058984,
+        "actual": 0.13676633444075303
+      },
+      "5": {
+        "n": 2383.0,
+        "mean_score": 66.3487201007134,
+        "predicted": 0.14894410823460374,
+        "actual": 0.15778430549727235
+      },
+      "6": {
+        "n": 1222.0,
+        "mean_score": 66.34042553191489,
+        "predicted": 0.14998880979726723,
+        "actual": 0.16039279869067102
+      },
+      "7": {
+        "n": 739.0,
+        "mean_score": 66.09742895805142,
+        "predicted": 0.152510571926375,
+        "actual": 0.16373477672530445
+      }
+    },
+    "medical_heavy": {
+      "False": {
+        "n": 10800.0,
+        "mean_score": 66.83722222222222,
+        "predicted": 0.14549716433907525,
+        "actual": 0.1499074074074074
+      },
+      "True": {
+        "n": 1200.0,
+        "mean_score": 63.954166666666666,
+        "predicted": 0.16553059379892385,
+        "actual": 0.15833333333333333
+      }
+    }
+  },
+  "robustness": {
+    "base": {
+      "default_rate": 0.15066666666666667,
+      "model_auc": 0.7642509937518234,
+      "formula_auc": 0.7323612850092385,
+      "oracle_auc": 0.7808019651019018,
+      "model_bias_pct_points": -0.16095653393549125
+    },
+    "budget_matters_more": {
+      "default_rate": 0.14608333333333334,
+      "model_auc": 0.7213385565911602,
+      "formula_auc": 0.6945124283589521,
+      "oracle_auc": 0.7450263711650249,
+      "model_bias_pct_points": 0.29737679939784156
+    },
+    "discipline_matters_more": {
+      "default_rate": 0.15016666666666667,
+      "model_auc": 0.8095552129979569,
+      "formula_auc": 0.775710221738327,
+      "oracle_auc": 0.8479106477538305,
+      "model_bias_pct_points": -0.11095653393549121
+    },
+    "noisier_world": {
+      "default_rate": 0.15108333333333332,
+      "model_auc": 0.7363883898402682,
+      "formula_auc": 0.7067483670366896,
+      "oracle_auc": 0.7483588066964639,
+      "model_bias_pct_points": -0.2026232006021561
+    },
+    "higher_default_rate": {
+      "default_rate": 0.25066666666666665,
+      "model_auc": 0.759907669110131,
+      "formula_auc": 0.7280013528573862,
+      "oracle_auc": 0.7770646159470356,
+      "model_bias_pct_points": -10.160956533935488
+    }
+  }
+}

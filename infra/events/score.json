@@ -1,0 +1,28 @@
+{
+  "body": {
+    "name": "Priya Sharma",
+    "email": "priya@example.com",
+    "consent": true,
+    "stateCode": "27",
+    "employmentType": "informal",
+    "loanHistory": "none",
+    "monthlyIncome": 22000,
+    "monthlyRent": 7000,
+    "monthlyFood": 6000,
+    "monthlyTransport": 1500,
+    "monthlyElectricity": 800,
+    "monthlyWaterGas": 400,
+    "monthlyMedical": 500,
+    "monthlyEducation": 0,
+    "existingEmi": 0,
+    "utilityOnTimePct": 88,
+    "utilityMonths": 18,
+    "rentOnTimePct": 92,
+    "rentMonths": 16,
+    "operator": "jio",
+    "monthlyRechargeSpend": 349,
+    "rechargeFrequency": 1,
+    "loanAmount": 15000,
+    "loanTenureMonths": 12
+  }
+}

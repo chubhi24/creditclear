@@ -1,0 +1,357 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: CreditClear explainable micro-credit scoring API (interim review)
+
+Parameters:
+  MailWebhookUrl:
+    Type: String
+    Default: ""
+    Description: Google Apps Script web app /exec URL that emails score reports (blank disables email)
+  MailWebhookSecret:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: Shared secret the Apps Script mailer checks (its MAIL_SECRET script property)
+  BudgetAlertEmail:
+    Type: String
+    Default: rohanpaul2468@gmail.com
+    Description: Gets an email if this AWS account's monthly bill passes (or is forecast to pass) USD 1
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 256
+    Runtime: nodejs22.x
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins:
+          - http://localhost:5173
+          - http://localhost:3000
+          - http://127.0.0.1:5173
+          - !Sub https://${SiteDistribution.DomainName}
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        MaxAge: 600
+      # Every route: 5 requests/second steady, bursts up to 10. Excess calls get HTTP 429 before Lambda runs,
+      # which caps cost and how fast /score can trigger report emails.
+      DefaultRouteSettings:
+        ThrottlingRateLimit: 5
+        ThrottlingBurstLimit: 10
+      Auth:
+        Authorizers:
+          CognitoJwt:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+              audience:
+                - !Ref UserPoolClient
+
+  ApplicationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: applicationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: applicationId
+          KeyType: HASH
+      # Each record carries expiresAt (90 days after scoring); DynamoDB deletes it after that.
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  ApplicationsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteApplicationsAfter90Days
+            Status: Enabled
+            Prefix: applications/
+            ExpirationInDays: 90
+
+  NotifyTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: CreditClear application scored
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: creditclear-lenders
+      # No self sign-up: lender accounts are created by an administrator only.
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireUppercase: true
+          RequireSymbols: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: creditclear-web
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      SupportedIdentityProviders:
+        - COGNITO
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+
+  # ---- Public website: React build in a private S3 bucket, served over HTTPS by CloudFront ----
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      # Never public: only CloudFront can read it, through the origin access control below.
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  SiteOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub ${AWS::StackName}-site
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: CreditClear website
+        Enabled: true
+        HttpVersion: http2and3
+        DefaultRootObject: index.html
+        # Includes edge locations in India, so pages load quickly there.
+        PriceClass: PriceClass_200
+        Origins:
+          - Id: site
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: site
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          AllowedMethods: [GET, HEAD]
+          # AWS managed policy "CachingOptimized"
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        # The app routes in the browser (/plan, /lender…). S3 has no such files, so serve index.html
+        # and let React Router render the page; a refresh or shared link then works.
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub ${SiteBucket.Arn}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
+
+  # Emails BudgetAlertEmail if the whole account's monthly bill passes, or is forecast to pass, USD 1.
+  CostBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: !Sub ${AWS::StackName}-monthly-1-usd
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: 1
+          Unit: USD
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref BudgetAlertEmail
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref BudgetAlertEmail
+
+  # Only members of this group can read the lender dashboard (checked in app.js).
+  LendersGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref UserPool
+      GroupName: lenders
+      Description: Can view the CreditClear lender dashboard
+
+  ScoringLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/creditclear-score
+      RetentionInDays: 14
+
+  ScoringFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: creditclear-score
+      CodeUri: src/
+      Handler: lambda.handler
+      Description: Express scoring API for CreditClear
+      LoggingConfig:
+        LogGroup: !Ref ScoringLogGroup
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ApplicationsTable
+          BUCKET_NAME: !Ref ApplicationsBucket
+          TOPIC_ARN: !Ref NotifyTopic
+          MAIL_WEBHOOK_URL: !Ref MailWebhookUrl
+          MAIL_WEBHOOK_SECRET: !Ref MailWebhookSecret
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref ApplicationsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref ApplicationsTable
+        - S3WritePolicy:
+            BucketName: !Ref ApplicationsBucket
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt NotifyTopic.TopicName
+      Events:
+        Health:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /health
+            Method: GET
+        Score:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /score
+            Method: POST
+        Market:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /market
+            Method: GET
+        LenderSummary:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /lender/summary
+            Method: GET
+            Auth:
+              Authorizer: CognitoJwt
+
+  ScoringErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: CreditClear scoring Lambda reported errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ScoringFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref NotifyTopic
+
+Outputs:
+  SiteUrl:
+    Description: Public CreditClear website
+    Value: !Sub https://${SiteDistribution.DomainName}
+  SiteBucketName:
+    Description: S3 bucket holding the website build (upload frontend/dist here)
+    Value: !Ref SiteBucket
+  SiteDistributionId:
+    Description: CloudFront distribution ID (for cache invalidations after an upload)
+    Value: !Ref SiteDistribution
+  ApiUrl:
+    Description: HTTP API base URL (append /score)
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+  UserPoolId:
+    Description: Cognito User Pool ID for the frontend
+    Value: !Ref UserPool
+  UserPoolClientId:
+    Description: Cognito app client ID for the frontend
+    Value: !Ref UserPoolClient
+  ApplicationsBucket:
+    Description: S3 bucket for application JSON snapshots
+    Value: !Ref ApplicationsBucket
+  NotifyTopicArn:
+    Description: SNS topic for scored-application notifications
+    Value: !Ref NotifyTopic
+  ApplicationsTable:
+    Description: DynamoDB table name
+    Value: !Ref ApplicationsTable

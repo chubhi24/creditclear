@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Surfaces */
+  --color-paper: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-line: #ece9e2;
+
+  /* Text and strong elements */
+  --color-ink: #111111;
+  --color-ink-muted: #5c5c5c;
+  --color-ink-faint: #9a9a9a;
+
+  /* Accent — links, active, focus, success. Use sparingly. */
+  --color-sage: #6b8f71;
+  --color-sage-tint: #e6eee7;
+  --color-sage-deep: #557459;
+
+  /* Destructive — delete and discard only */
+  --color-danger: #d64545;
+  --color-danger-tint: #fbeaea;
+  --color-danger-deep: #b83636;
+
+  --radius-soft: 1.25rem;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-sage-tint);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 3px;
+  border-radius: 0.75rem;
+}
+
+/* Serif only for large display headings */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* Elements revealed by GSAP start hidden only when motion is allowed */
+@media (prefers-reduced-motion: no-preference) {
+  .js-motion [data-reveal] {
+    opacity: 0;
+  }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
+}
